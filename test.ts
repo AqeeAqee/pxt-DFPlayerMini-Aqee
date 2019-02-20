@@ -12,7 +12,7 @@ while (true) {
 
     DFPlayerMini_Aqee.playNext()
     basic.pause(1000)
-    for (let i = 0; i < 15; i++) {
+    for (let i = 1; i < 6; i++) {
         DFPlayerMini_Aqee.play(i)
         basic.pause(1000)
     }

@@ -1,8 +1,61 @@
-//%
+/**
+ * Provides access to DFPlayerMini functionality.
+ */
+//% icon="\uf1c7"
+//% color="255" weight="90"
+//% block="DFPlayerMini"
 namespace DFPlayerMini_Aqee {
+
+    /**
+     * Initialize, before any actions
+     */
+    //%block="Initialize"
+    export function begin() {
+        _sending = control.createBuffer(DFPLAYER_SEND_LENGTH)
+        //_sending.fill(0)
+        _sending[Stack_Header] = 0x7E
+        _sending[Stack_Version] = 0xFF
+        _sending[Stack_Length] = 0x06
+        _sending[Stack_Command] = 0x0
+        _sending[Stack_ACK] = 0x0 // ACK=0,1
+        _sending[Stack_Parameter] = 0x0
+        _sending[Stack_Parameter + 1] = 0x0
+        _sending[Stack_CheckSum] = 0x0
+        _sending[Stack_CheckSum + 1] = 0x0
+        _sending[Stack_End] = 0xEF
+
+    }
+
+    /**
+     * set volume
+     * @param value volume to set, eg: 20
+     */
+    //% value.min=0 value.max=30
+    //% block="volume %value"
+    export function volume(value: number): void {
+        sendCmdArg(0x06, value);
+    }
+
+    /**
+     * fileNumber to play, it is of the order when copying to disk, not sort by filename)
+     * @param fileNumber fileNumber , eg: 1
+     */
+    //% fileNumber.min=1 fileNumber.max=999
+    //% block="play file no:%fileNumber"
+    export function play(fileNumber: number): void {
+        sendCmdArg(0x03, fileNumber);
+    }
+
+    /**
+     * Play the next Audio file
+     */
+    //% block="play next"
+    export function playNext(): void {
+        sendCommand(0x01);
+    }
+
+
     let _DEBUG = 0
-
-
 
     const DFPLAYER_EQ_NORMAL = 0
     const DFPLAYER_EQ_POP = 1
@@ -54,21 +107,8 @@ namespace DFPlayerMini_Aqee {
 
     let _sending = control.createBuffer(DFPLAYER_SEND_LENGTH)
 
-    //%
-    export function begin() {
-        _sending = control.createBuffer(DFPLAYER_SEND_LENGTH)
-        //_sending.fill(0)
-        _sending[Stack_Header] = 0x7E
-        _sending[Stack_Version] = 0xFF
-        _sending[Stack_Length] = 0x06
-        _sending[Stack_Command] = 0x0
-        _sending[Stack_ACK] = 0x0 // ACK=0,1
-        _sending[Stack_Parameter] = 0x0
-        _sending[Stack_Parameter + 1] = 0x0
-        _sending[Stack_CheckSum] = 0x0
-        _sending[Stack_CheckSum + 1] = 0x0
-        _sending[Stack_End] = 0xEF
-
+    function writeInt16toSendStack(value: number, index: number) {
+        _sending.setNumber(NumberFormat.Int16BE, index, value)
     }
 
     function debug(value: number = 1) {
@@ -123,25 +163,6 @@ namespace DFPlayerMini_Aqee {
         let buffer = argumentHigh;
         buffer <<= 8;
         sendCmdArg(command, buffer | argumentLow);
-    }
-
-    function writeInt16toSendStack(value: number, index: number) {
-        _sending.setNumber(NumberFormat.Int16BE, index, value)
-    }
-
-    //%
-    export function volume(value: number) {
-        sendCmdArg(0x06, value);
-    }
-
-    //%
-    export function play(fileNumber: number) {
-        sendCmdArg(0x03, fileNumber);
-    }
-
-    //%
-    export function playNext() {
-        sendCommand(0x01);
     }
 
 
